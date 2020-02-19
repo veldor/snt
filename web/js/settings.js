@@ -1,5 +1,11 @@
-
+"use strict";
 function handleSettings() {
+    let updateBtn = $('button#doUpdate');
+    updateBtn.on('click.getUpdate',
+        function () {
+            sendAjax('get', '/update', simpleAnswerHandler);
+        });
+
     let form = $('form#bank-settings-form');
     form.on('submit', function (e) {
        e.preventDefault();

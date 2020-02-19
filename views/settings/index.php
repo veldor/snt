@@ -189,10 +189,12 @@ $this->title = 'Настройки';
             ?>
         </div>
     </div>
-    <div class="tab-pane" id="power_settings">
+    <div class="tab-pane" id="misc_settings">
         <div class="row">
+            <div class="col-sm-12">
+                <button id="doUpdate" class="btn btn-default"><span class="text-success">Обновить до последней версии</span></button>
+            </div>
            <div class="btn-group">
-               <button id="doUpdate" class="btn btn-default"><span class="text-success">Обновить до последней версии</span></button>
            </div>
         </div>
     </div>

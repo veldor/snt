@@ -49,4 +49,7 @@ return [
 
     'cottage/next' => 'site/next',
     'cottage/previous' => 'site/previous',
+
+
+    'update' => 'utils/update',
 ];
