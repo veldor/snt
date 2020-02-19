@@ -21,6 +21,10 @@ echo $form->field($matrix, 'payer', ['template' =>
 );
 
 
+echo $form->field($matrix, 'period', ['template' =>
+    '<div class="col-sm-4">{label}</div><div class="col-sm-8">{input}{error}{hint}</div>'])
+    ->textInput();
+
 echo $form->field($matrix, 'oldData', ['template' =>
     '<div class="col-sm-4">{label}</div><div class="col-sm-8">{input}{error}{hint}</div>'])
     ->textInput(['type' => 'number']);
