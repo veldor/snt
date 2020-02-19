@@ -32,4 +32,10 @@ tests/_support/_generated
 #vagrant folder
 /.vagrant
 # Project exclude paths
-/runtime/
+runtime/
+# Test
+test/
+# vargant
+vargant/
+import/
+settings/

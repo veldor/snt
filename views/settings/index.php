@@ -31,6 +31,7 @@ $this->title = 'Настройки';
     <li><a href="#email_template" data-toggle="tab">Стандартный шаблон письма</a></li>
     <li><a href="#bill_email_template" data-toggle="tab">Шаблон сообщения о выставленном счёте</a></li>
     <li><a href="#power_settings" data-toggle="tab">Настройки электроэнергии</a></li>
+    <li><a href="#misc_settings" data-toggle="tab">Разные настройки</a></li>
 </ul>
 
 <div class="tab-content">
@@ -186,6 +187,13 @@ $this->title = 'Настройки';
             echo Html::submitButton('Сохранить', ['class' => 'btn btn-primary']);
             ActiveForm::end();
             ?>
+        </div>
+    </div>
+    <div class="tab-pane" id="power_settings">
+        <div class="row">
+           <div class="btn-group">
+               <button id="doUpdate" class="btn btn-default"><span class="text-success">Обновить до последней версии</span></button>
+           </div>
         </div>
     </div>
 </div>
