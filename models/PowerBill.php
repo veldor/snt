@@ -47,7 +47,7 @@ class PowerBill extends Model
     public function scenarios():array
     {
         return [
-            self::SCENARIO_CREATE => ['cottageId', 'oldData', 'newData', 'limit', 'cost', 'overcost', 'period', 'payer', 'no_limit'],
+            self::SCENARIO_CREATE => ['cottageId', 'oldData', 'newData', 'limit', 'cost', 'overcost', 'period', 'payer', 'no_limit', 'countedSumm'],
             self::SCENARIO_EDIT => ['limit', 'cost', 'overcost'],
         ];
     }
@@ -91,5 +91,36 @@ class PowerBill extends Model
         file_put_contents($file, "{$this->limit}\n{$cost}\n{$overcost}");
         Yii::$app->session->addFlash('success', 'Данные по электроэнергии обновлены.');
         return ['status' => 1];
+    }
+
+    public function save()
+    {
+        $oldData = $this->oldData;
+        $newData = $this->newData;
+        $diff = $newData - $oldData;
+        // посчитаю стоимость и сравню с посчитанной скриптом
+        $details = "Электроэнергия: Период: {$this->period}; Израсходовано: $diff квт.ч;";
+        if($this->no_limit){
+            $cost = CashHandler::toDBCash($diff * $this->overcost);
+        }
+        else{
+            $limit = $this->limit;
+            if($diff > $limit){
+                $smoothInLimitCost = CashHandler::toSmooth($limit * $this->cost * 100);
+                $details .= " Льготно: {$limit} квт.ч. * {$this->cost} р = $smoothInLimitCost";
+                $overLimit = $diff - $limit;
+                $smoothOverLimitCost = CashHandler::toSmooth($overLimit * $this->overcost * 100);
+                $details .= " Сверх: {$overLimit} квт.ч. * {$this->overcost} р = $smoothOverLimitCost";
+                $cost = $limit * $this->cost + $overLimit * $this->overcost;
+                $smoothCost = CashHandler::toSmooth($cost * 100);
+                $details .= "Итого: $smoothCost";
+            }
+            else{
+                $cost = CashHandler::toDBCash($diff * $this->cost);
+                $details .= " Льготно: {$diff} * {$this->cost} = " . CashHandler::toSmooth($cost) . "";
+            }
+        }
+        echo $details;
+        die;
     }
 }

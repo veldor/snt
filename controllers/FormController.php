@@ -353,9 +353,10 @@ class FormController extends Controller
         }
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            $form = new Bill(['scenario' => Bill::SCENARIO_CREATE]);
+            $form = new PowerBill();
+            $form->setScenario(PowerBill::SCENARIO_CREATE);
             $form->load(Yii::$app->request->post());
-            if($form->validate() && $form->fillMore()){
+            if($form->validate()){
                 $form->save();
                 Yii::$app->session->addFlash('success', 'Добавлен счёт.');
                 return ['status' => 1];
