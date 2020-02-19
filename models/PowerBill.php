@@ -121,6 +121,7 @@ class PowerBill extends Model
             }
         }
         echo $details;
+        echo $details;
         die;
     }
 }
