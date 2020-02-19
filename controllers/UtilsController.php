@@ -37,8 +37,9 @@ class UtilsController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionMailingCreate(){
-        if(Yii::$app->request->isAjax && Yii::$app->request->isPost){
+    public function actionMailingCreate()
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return Mailing::createMailing();
         }
@@ -47,7 +48,8 @@ class UtilsController extends Controller
     /**
      * @return array
      */
-    public function actionMailDelete(){
+    public function actionMailDelete()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Mail::deleteMail();
     }
@@ -57,7 +59,8 @@ class UtilsController extends Controller
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionPhoneDelete(){
+    public function actionPhoneDelete()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Phone::deletePhone();
     }
@@ -67,16 +70,19 @@ class UtilsController extends Controller
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionPayerDelete(){
+    public function actionPayerDelete()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Payer::deletePayer();
     }
+
     /**
      * @return array
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionBillDelete(){
+    public function actionBillDelete()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Bill::deleteBill();
     }
@@ -113,39 +119,47 @@ class UtilsController extends Controller
         return Bill::invoicePrinted();
     }
 
-    public function actionSendNotifications(){
+    public function actionSendNotifications()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Mailing::sendBillNotifications();
     }
 
-    public function actionCancelMailing(){
-        if(Yii::$app->request->isAjax && Yii::$app->request->isPost){
+    public function actionCancelMailing()
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return Mailing::cancelMailing();
         }
     }
 
-    public function actionSendMessage(){
-        if(Yii::$app->request->isAjax && Yii::$app->request->isPost){
+    public function actionSendMessage()
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return Mailing::sendMessage();
         }
     }
-    public function actionGetUnsendedMessagesCount(){
-        if(Yii::$app->request->isAjax && Yii::$app->request->isGet){
+
+    public function actionGetUnsendedMessagesCount()
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return['status' => 1, 'count' => MailingSchedule::countWaiting()];
+            return ['status' => 1, 'count' => MailingSchedule::countWaiting()];
         }
     }
 
-    public function actionSaveMailTemplate(){
-        if(Yii::$app->request->isAjax && Yii::$app->request->isPost){
+    public function actionSaveMailTemplate()
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return Mailing::saveMailTemplate();
         }
     }
-    public function actionSaveBillMailTemplate(){
-        if(Yii::$app->request->isAjax && Yii::$app->request->isPost){
+
+    public function actionSaveBillMailTemplate()
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return Bill::saveMailTemplate();
         }
@@ -155,32 +169,35 @@ class UtilsController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionClearMailingSchedule(){
-        if(Yii::$app->request->isAjax && Yii::$app->request->isPost) {
+    public function actionClearMailingSchedule()
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return MailingSchedule::clearSchedule();
         }
         throw new NotFoundHttpException();
     }
+
     /**
      * @return array
      * @throws NotFoundHttpException
      */
     public function actionDeleteMailing(): array
     {
-        if(Yii::$app->request->isAjax && Yii::$app->request->isPost) {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return \app\models\database\Mailing::deleteMailing();
         }
         throw new NotFoundHttpException();
     }
+
     /**
      * @return array
      * @throws NotFoundHttpException
      */
     public function actionDeleteBills(): array
     {
-        if(Yii::$app->request->isAjax && Yii::$app->request->isPost) {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return MassBill::deleteBills();
         }
@@ -197,6 +214,7 @@ class UtilsController extends Controller
         $info = \app\models\database\Mailing::getMailingInfo($id);
         return ['status' => 1, 'html' => $info];
     }
+
     /**
      * @param $id
      * @return array
@@ -206,5 +224,14 @@ class UtilsController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $info = Bill::getBillInfo($id);
         return ['status' => 1, 'html' => $info];
+    }
+
+    public function actionUpdate()
+    {
+        $file = dirname($_SERVER['DOCUMENT_ROOT'] . './/') . '/updateFromGithub.bat';
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        exec($file);
+        Yii::$app->session->addFlash('success', 'Программа обновлена до последней версии.');
+        return ['status' => 1];
     }
 }

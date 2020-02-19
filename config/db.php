@@ -1,10 +1,11 @@
 <?php
 
+$dbSettings = require __DIR__ . '/db_settings.php';
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=linda',
-    'username' => 'cottageAdmin',
-    'password' => 'W8bqFd',
+    'dsn' => $dbSettings['database'],
+    'username' => $dbSettings['login'],
+    'password' => $dbSettings['password'],
     'charset' => 'utf8',
 
     // Schema cache options (for production environment)
