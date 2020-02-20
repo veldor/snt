@@ -7,6 +7,7 @@ use app\models\database\Cottage;
 use app\models\database\Mail;
 use app\models\database\Payer;
 use app\models\database\Phone;
+use app\models\PowerBill;
 use nirvana\showloading\ShowLoadingAsset;
 use yii\web\View;
 
@@ -91,10 +92,17 @@ $this->title = "$cottage->num участок";
 
 
     if(!empty($bills)){
+
         echo "<div class='col-sm-12'><h2 class='text-center'>Счета участка</h2></div>";
 
         echo '<div class=\'col-sm-12\'><table class="table table-condensed table-striped"><thead><tr><th>Назначение</th><th>Детали</th><th>Плательщик</th><th>Сумма счёта</th><th>Действия</th></tr></thead><tbody>';
         foreach ($bills as $bill){
+            if($bill->service_name === 'power'){
+                $description = PowerBill::getDescription($bill);
+            }
+            else{
+                $description = $bill->bill_destination;
+            }
             $billType = Bill::getType($bill->service_name);
             $amount = CashHandler::toSmooth($bill->amount);
             $saveBtn = $bill->is_saved ? "<a target='_blank' href='/pdf/{$bill->id}' class='btn btn-default tooltip-enabled save-pdf' data-toggle='tooltip' data-placement='auto' title='Сохранить как PDF (уже сохранялось)' data-bill-id='{$bill->id}'><span class='text-success glyphicon glyphicon-saved'></span></a>": "<a target='_blank' href='/pdf/{$bill->id}' class='btn btn-default tooltip-enabled save-pdf' data-toggle='tooltip' data-placement='auto' title='Сохранить как PDF' data-bill-id='{$bill->id}'><span class='text-info glyphicon glyphicon-saved'></span></a>";
@@ -103,7 +111,7 @@ $this->title = "$cottage->num участок";
 
             $printBtn = $bill->is_printed ? "<a href='/bill/{$bill->id}' target='_blank' class='btn btn-default tooltip-enabled print-bill' data-toggle='tooltip' data-placement='auto' title='Распечатать (уже печаталось)' data-bill-id='{$bill->id}'><span class='text-success glyphicon glyphicon-print'></span></a>" : "<a href='/bill/{$bill->id}' target='_blank' class='btn btn-default tooltip-enabled print-bill' data-toggle='tooltip' data-placement='auto' title='Распечатать' data-bill-id='{$bill->id}'><span class='text-info glyphicon glyphicon-print'></span></a>";
 
-            echo "<tr><td>$billType</td><td>{$bill->bill_destination}</td><td>{$bill->payer}</td><td>{$amount}</td><td><div class='btn-group'><button class='btn btn-default bill-delete' data-id='{$bill->id}'><span class='text-danger glyphicon glyphicon-trash'></span></button><button class='btn btn-default bill-change' data-id='{$bill->id}'><span class='text-info glyphicon glyphicon-pencil'></span></button>$printBtn $sendBtn $saveBtn</div></td></tr>";
+            echo "<tr><td>$billType</td><td>$description</td><td>{$bill->payer}</td><td>{$amount}</td><td><div class='btn-group'><button class='btn btn-default bill-delete' data-id='{$bill->id}'><span class='text-danger glyphicon glyphicon-trash'></span></button><button class='btn btn-default bill-change' data-id='{$bill->id}'><span class='text-info glyphicon glyphicon-pencil'></span></button>$printBtn $sendBtn $saveBtn</div></td></tr>";
         }
         echo '</tbody></table></div>';
 

@@ -73,8 +73,8 @@ ActiveForm::end();
         let hint = inputForResult.parent().find('div.help-block');
 
         function countCost(){
-            let oldData = oldDataInput.val();
-            let newData = newDataInput.val();
+            let oldData = parseInt(oldDataInput.val());
+            let newData = parseInt(newDataInput.val());
             if(oldData && newData && oldData < newData){
                 // посчитаю разницу
                 let difference = newData - oldData;

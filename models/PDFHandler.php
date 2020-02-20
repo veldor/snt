@@ -37,12 +37,16 @@ class PDFHandler
     public static function saveBillPdf($billId): array
     {
         $billInfo = Bill::findOne($billId);
+        if(empty($billInfo)){
+            die('Не найдена информация об участке');
+        }
         $invoice = Invoice::getInstance($billInfo);
         $type = Bill::getType($billInfo->service_name);
         $text = Yii::$app->controller->renderPartial('/site/bank-invoice-pdf.php', ['bill' => $billInfo, 'invoice' => $invoice]);
         /*var_dump($text);
         die;*/
+        $dest = PowerBill::getDescription($billInfo);
         self::renderPDF($text, 'invoice.pdf', 'portrait');
-        return ['url' => Yii::getAlias('@webroot') . '/invoice.pdf', 'name' => 'Участок ' . $billInfo->cottageNumber . ' ' . $type . '_' . $billInfo->bill_destination . '.pdf'];
+        return ['url' => Yii::getAlias('@webroot') . '/invoice.pdf', 'name' => 'Участок ' . $billInfo->cottageNumber . ' ' . $type . '_' . $dest . '.pdf'];
     }
 }
