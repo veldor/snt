@@ -31,7 +31,7 @@ $this->title = 'Настройки';
     <li><a href="#email_template" data-toggle="tab">Стандартный шаблон письма</a></li>
     <li><a href="#bill_email_template" data-toggle="tab">Шаблон сообщения о выставленном счёте</a></li>
     <li><a href="#power_settings" data-toggle="tab">Настройки электроэнергии</a></li>
-    <li><a href="#misc_settings" data-toggle="tab">Разные настройки</a></li>
+    <!--<li><a href="#misc_settings" data-toggle="tab">Разные настройки</a></li>-->
 </ul>
 
 <div class="tab-content">
@@ -189,7 +189,7 @@ $this->title = 'Настройки';
             ?>
         </div>
     </div>
-    <div class="tab-pane" id="misc_settings">
+    <!--<div class="tab-pane" id="misc_settings">
         <div class="row">
             <div class="col-sm-12">
                 <button id="doUpdate" class="btn btn-default"><span class="text-success">Обновить до последней версии</span></button>
@@ -197,6 +197,6 @@ $this->title = 'Настройки';
            <div class="btn-group">
            </div>
         </div>
-    </div>
+    </div>-->
 </div>
 
