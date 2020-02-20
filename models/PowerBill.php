@@ -4,6 +4,11 @@
 namespace app\models;
 
 
+use app\models\database\Bill;
+use app\models\database\Cottage;
+use app\models\database\Payer;
+use DOMElement;
+use Exception;
 use Yii;
 use yii\base\Model;
 
@@ -42,9 +47,108 @@ class PowerBill extends Model
     }
 
     /**
+     * @param Bill $bill
+     * @return string
+     */
+    public static function getDescription(Bill $bill): string
+    {
+        try {
+            $info = new DOMHandler($bill->bill_destination);
+            /** @var DOMElement $data */
+            $data = $info->query('/pay/power');
+            $attributes = DOMHandler::getElemAttributes($data[0]);
+            $noLimit = $attributes['ignore-limit'];
+            $diff = $attributes['new-data'] - $attributes['old-data'];
+            if ($noLimit) {
+                $details = "$diff * {$attributes['overcost']}";
+            } else if ($diff < $attributes['limit']) {
+                $details = "$diff * {$attributes['cost']}";
+            } else {
+                $over = $diff - $attributes['limit'];
+                $details = "{$attributes['limit']}квт*{$attributes['cost']}; {$over}квт*{$attributes['overcost']}";
+            }
+            $description = urldecode($attributes['period']) . "; $details; пок.сч. {$attributes['new-data']}";
+            return $description;
+        } catch (Exception $e) {
+            return $bill->bill_destination;
+        }
+    }
+
+    /**
+     * @param Bill $bill
+     * @return bool|null
+     */
+    public static function isTemplated(Bill $bill): ?bool
+    {
+        try {
+            new DOMHandler($bill->bill_destination);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param Bill $bill
+     * @return string
+     */
+    public static function getDetailsTable(Bill $bill): ?string
+    {
+        try {
+            $info = new DOMHandler($bill->bill_destination);
+            /** @var DOMElement $data */
+            $data = $info->query('/pay/power');
+            $attributes = DOMHandler::getElemAttributes($data[0]);
+
+            $noLimit = $attributes['ignore-limit'];
+            $diff = $attributes['new-data'] - $attributes['old-data'];
+            if ($noLimit) {
+                $details = "<tr><td>Сверх нормы</td><td>$diff  кВт⋅ч * {$attributes['overcost']} ₽</td></tr>";
+            } else if ($diff < $attributes['limit']) {
+                $details = "<tr><td>Льготный тариф</td><td>$diff  кВт⋅ч * {$attributes['cost']} ₽</td></tr>";
+            } else {
+                $over = $diff - $attributes['limit'];
+                $details = "<tr><td>Льготный тариф</td><td>$diff * {$attributes['cost']} ₽</td></tr><tr><td>Сверх нормы</td><td>$over * {$attributes['overcost']} ₽</td></tr>";
+            }
+            $text = "
+            <table class='table table-striped'><tbody>
+                <tr>
+                    <td>Тип</td>
+                    <td>Электроэнергия</td>
+                </tr>
+                <tr>
+                    <td>Период</td>
+                    <td>" . urldecode($attributes['period']) . "</td>
+                </tr>
+                <tr>
+                    <td>Предыдущие показания</td>
+                    <td>{$attributes['old-data']} кВт⋅ч</td>
+                </tr>
+                <tr>
+                    <td>Новые показания</td>
+                    <td>{$attributes['new-data']} кВт⋅ч</td>
+                </tr>
+                <tr>
+                    <td>Потрачено за месяц</td>
+                    <td>{$diff} кВт⋅ч</td>
+                </tr>
+                <tr>
+                    <td>Общая стоимость</td>
+                    <td>" . CashHandler::toSmooth($bill->amount) . "</td>
+                </tr>
+                $details
+           </tbody> </table>
+            ";
+            return $text;
+        } catch (Exception $e) {
+            return '';
+        }
+    }
+
+    /**
      * @return array
      */
-    public function scenarios():array
+    public function scenarios(): array
     {
         return [
             self::SCENARIO_CREATE => ['cottageId', 'oldData', 'newData', 'limit', 'cost', 'overcost', 'period', 'payer', 'no_limit', 'countedSumm'],
@@ -52,7 +156,7 @@ class PowerBill extends Model
         ];
     }
 
-    public function attributeLabels():array
+    public function attributeLabels(): array
     {
         return [
             'limit' => 'Лимит льготного потребления',
@@ -71,11 +175,10 @@ class PowerBill extends Model
     /**
      * @return array
      */
-    public function rules():array
+    public function rules(): array
     {
         return [
-            // name, email, subject и body атрибуты обязательны
-            [['limit', 'cost', 'overcost'], 'required'],
+            [['limit', 'cost', 'overcost', 'period'], 'required'],
             [['oldData', 'newData'], 'integer'],
         ];
     }
@@ -93,34 +196,48 @@ class PowerBill extends Model
         return ['status' => 1];
     }
 
-    public function save()
+    /**
+     * @return array
+     */
+    public function save(): array
     {
+        $cottage = Cottage::findOne($this->cottageId);
+        if (empty($cottage)) {
+            die('Не найден участок');
+        }
+        $payer = Payer::findOne($this->payer);
+        if (empty($payer)) {
+            die('Не найден плательщик');
+        }
         $oldData = $this->oldData;
         $newData = $this->newData;
         $diff = $newData - $oldData;
         // посчитаю стоимость и сравню с посчитанной скриптом
-        $details = "Электроэнергия: Период: {$this->period}; Израсходовано: $diff квт.ч;";
-        if($this->no_limit){
+        if ($this->no_limit) {
             $cost = CashHandler::toDBCash($diff * $this->overcost);
-        }
-        else{
+        } else {
             $limit = $this->limit;
-            if($diff > $limit){
-                $smoothInLimitCost = CashHandler::toSmooth($limit * $this->cost * 100);
-                $details .= " Льготно: {$limit} квт.ч. * {$this->cost} р = $smoothInLimitCost";
+            if ($diff > $limit) {
                 $overLimit = $diff - $limit;
-                $smoothOverLimitCost = CashHandler::toSmooth($overLimit * $this->overcost * 100);
-                $details .= " Сверх: {$overLimit} квт.ч. * {$this->overcost} р = $smoothOverLimitCost";
-                $cost = $limit * $this->cost + $overLimit * $this->overcost;
-                $smoothCost = CashHandler::toSmooth($cost * 100);
-                $details .= "Итого: $smoothCost";
-            }
-            else{
+                $cost = CashHandler::toDBCash($limit * $this->cost + $overLimit * $this->overcost);
+            } else {
                 $cost = CashHandler::toDBCash($diff * $this->cost);
-                $details .= " Льготно: {$diff} * {$this->cost} = " . CashHandler::toSmooth($cost) . "";
             }
         }
-        echo $details;
-        die;
+        /** @noinspection UnknownInspectionInspection */
+        /** @noinspection HtmlUnknownAttribute */
+        $xml = "<pay><power period='" . urlencode($this->period) . "' old-data='{$this->oldData}' new-data='{$this->newData}' ignore-limit='$this->no_limit' limit='{$this->limit}' cost='{$this->cost}' overcost='$this->overcost'/></pay>";
+
+        $bill = new Bill(['scenario' => Bill::SCENARIO_CREATE]);
+        $bill->amount = $cost;
+        $bill->cottage = $this->cottageId;
+        $bill->cottageNumber = $cottage->num;
+        $bill->payer = $payer->fio;
+        $bill->payer_address = $payer->address;
+        $bill->service_name = 'power';
+        $bill->create_date = time();
+        $bill->bill_destination = $xml;
+        $bill->save();
+        return ['status' => 1];
     }
 }

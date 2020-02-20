@@ -6,6 +6,7 @@ namespace app\models\database;
 
 use app\models\CashHandler;
 use app\models\DOMHandler;
+use app\models\PowerBill;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -40,7 +41,7 @@ class Bill extends ActiveRecord
         if (!empty($massBill)) {
             // получу выставленные счета
             $bills = self::find()->where(['mass_bill_id' => $massBill->id])->all();
-            if(!empty($bills)){
+            if (!empty($bills)) {
                 foreach ($bills as $billItem) {
                     $answer .= "<tr><td>{$billItem->cottageNumber}</td><td>Счёт выставлен</td></tr>";
                 }
@@ -106,8 +107,16 @@ class Bill extends ActiveRecord
         return ['message' => 'Не найден идентификатор счёта'];
     }
 
-    public static function getMailingTemplate()
+    /**
+     * @param $bill Bill
+     * @return false|string
+     */
+    public static function getMailingTemplate($bill = null)
     {
+        if ($bill != null && $bill->service_name === 'power' && PowerBill::isTemplated($bill)) {
+            // добавлю в текст таблицу с данными по электроэнергии
+            $powerDetails = PowerBill::getDetailsTable($bill);
+        }
         $filename = dirname($_SERVER['DOCUMENT_ROOT'] . './/') . '/settings/bill_mail_template';
         if (is_file($filename)) {
             $content = file_get_contents($filename);
@@ -115,10 +124,17 @@ class Bill extends ActiveRecord
         if (empty($content)) {
             return 'Заполните шаблон письма о счёте в разделе настроек';
         }
+        if (!empty($powerDetails)) {
+            $content .= $powerDetails;
+        }
+
         return $content;
     }
 
-    public static function saveMailTemplate()
+    /**
+     * @return array|null
+     */
+    public static function saveMailTemplate(): ?array
     {
         $text = Yii::$app->request->post('template');
         if (!empty($text)) {

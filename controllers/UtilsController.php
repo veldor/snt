@@ -1,21 +1,22 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
+/** @noinspection PhpUndefinedClassInspection */
 
 namespace app\controllers;
 
 use app\models\database\Bill;
-use app\models\database\Cottage;
 use app\models\database\Mail;
 use app\models\database\MailingSchedule;
 use app\models\database\MassBill;
 use app\models\database\Payer;
 use app\models\database\Phone;
-use app\models\Invoice;
 use app\models\Mailing;
 use app\models\PDFHandler;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\web\Controller;
+use yii\web\ErrorAction;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -28,7 +29,7 @@ class UtilsController extends Controller
     {
         return [
             'error' => [
-                'class' => 'yii\web\ErrorAction',
+                'class' => ErrorAction::class,
             ],
         ];
     }
@@ -37,18 +38,19 @@ class UtilsController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionMailingCreate()
+    public function actionMailingCreate(): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return Mailing::createMailing();
         }
+        throw new NotFoundHttpException();
     }
 
     /**
      * @return array
      */
-    public function actionMailDelete()
+    public function actionMailDelete(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Mail::deleteMail();
@@ -59,7 +61,7 @@ class UtilsController extends Controller
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionPhoneDelete()
+    public function actionPhoneDelete(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Phone::deletePhone();
@@ -70,7 +72,7 @@ class UtilsController extends Controller
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionPayerDelete()
+    public function actionPayerDelete(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Payer::deletePayer();
@@ -78,10 +80,9 @@ class UtilsController extends Controller
 
     /**
      * @return array
-     * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionBillDelete()
+    public function actionBillDelete(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Bill::deleteBill();
@@ -90,7 +91,6 @@ class UtilsController extends Controller
 
     /**
      * Счёт сохранён как PDF
-     * @throws NotFoundHttpException
      */
     public function actionInvoiceSaved(): array
     {
@@ -111,7 +111,6 @@ class UtilsController extends Controller
 
 
     /**
-     * @throws NotFoundHttpException
      */
     public function actionInvoicePrinted(): array
     {
@@ -119,57 +118,84 @@ class UtilsController extends Controller
         return Bill::invoicePrinted();
     }
 
-    public function actionSendNotifications()
+    public function actionSendNotifications(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Mailing::sendBillNotifications();
     }
 
-    public function actionCancelMailing()
+    /**
+     * @return array|null
+     * @throws NotFoundHttpException
+     */
+    public function actionCancelMailing(): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return Mailing::cancelMailing();
         }
+        throw new NotFoundHttpException();
     }
 
-    public function actionSendMessage()
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function actionSendMessage(): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return Mailing::sendMessage();
         }
-    }
-
-    public function actionGetUnsendedMessagesCount()
-    {
-        if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return ['status' => 1, 'count' => MailingSchedule::countWaiting()];
-        }
-    }
-
-    public function actionSaveMailTemplate()
-    {
-        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return Mailing::saveMailTemplate();
-        }
-    }
-
-    public function actionSaveBillMailTemplate()
-    {
-        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return Bill::saveMailTemplate();
-        }
+        throw new NotFoundHttpException();
     }
 
     /**
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionClearMailingSchedule()
+    public function actionGetUnsendedMessagesCount(): array
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['status' => 1, 'count' => MailingSchedule::countWaiting()];
+        }
+        throw new NotFoundHttpException();
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionSaveMailTemplate(): array
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return Mailing::saveMailTemplate();
+        }
+        throw new NotFoundHttpException();
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionSaveBillMailTemplate(): array
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return Bill::saveMailTemplate();
+        }
+        throw new NotFoundHttpException();
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionClearMailingSchedule(): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -226,11 +252,12 @@ class UtilsController extends Controller
         return ['status' => 1, 'html' => $info];
     }
 
-    public function actionUpdate()
+    public function actionUpdate(): array
     {
         $file = dirname($_SERVER['DOCUMENT_ROOT'] . './/') . '/updateFromGithub.bat';
         Yii::$app->response->format = Response::FORMAT_JSON;
-        exec($file);
+        $result = exec($file);
+        file_put_contents('update_result.txt', $result);
         Yii::$app->session->addFlash('success', 'Программа обновлена до последней версии.');
         return ['status' => 1];
     }

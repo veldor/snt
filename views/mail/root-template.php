@@ -11,15 +11,16 @@ $rootTemplate = Mailing::getMailingTemplate();
 /* @var $this View */
 /* @var $mail Mail */
 /* @var $bill Bill */
+
 /* @var $mailing app\models\database\Mailing */
 
 $acceptorIO = GrammarHandler::handlePersonals($mail->fio);
 
-if(!empty($bill)){
-    $text = Bill::getMailingTemplate();
+if (!empty($bill)) {
+    $text = Bill::getMailingTemplate($bill);
 }
 
-if(!empty($mailing)){
+if (!empty($mailing)) {
     $text = urldecode($mailing->body);
 }
 
@@ -38,21 +39,13 @@ $text = GrammarHandler::handleMailText($rootTemplate, $acceptorIO, $text);
             padding: 0;
         }
 
-        .text-center {
-            text-align: center;
+        .table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 20px;
         }
-
-        .social-icon {
-            width: 30px;
-            height: 30px;
-            position: relative;
-            margin-top: 10px;
-            top: 10px;
-        }
-
-        img.logo-img {
-            width: 50%;
-            margin-left: 25%;
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #f9f9f9;
         }
     </style>
     <title></title>

@@ -9,12 +9,19 @@
 use app\models\CashHandler;
 use app\models\database\Bill;
 use app\models\Invoice;
+use app\models\PowerBill;
 use yii\web\View;
 
 
 /* @var $this View */
 /* @var $bill Bill */
 /* @var $invoice Invoice */
+if($bill->service_name === 'power'){
+    $description = PowerBill::getDescription($bill);
+}
+else{
+    $description = $bill->bill_destination;
+}
 
 $category = Bill::getType($bill->service_name);
 $amount = CashHandler::toSmooth($bill->amount);
@@ -33,7 +40,7 @@ $text = "
         <b> ФИО:</b> {$invoice->lastname};
         <b> Адрес:</b> {$invoice->payerAddress};
         <b>Наименование услуги:</b> {$category};
-        <b>Назначение:</b> {$invoice->purpose};</div>
+        <b>Назначение:</b> {$description};</div>
 <div class='description margened text-center'><span>(назначение платежа)</span></div>
 <div class='text-center bottom-bordered'><b>Сумма: {$amount}</b></div>
 <div class='description margened text-center'><span>(сумма платежа)</span></div>

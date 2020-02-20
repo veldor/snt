@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUndefinedClassInspection */
 
 
 namespace app\models;
@@ -21,7 +21,7 @@ class Mailing
      * @return array
      * @throws NotFoundHttpException
      */
-    public static function createMailing()
+    public static function createMailing(): array
     {
         $title = Yii::$app->request->post('title');
         $body = Yii::$app->request->post('body');
@@ -58,7 +58,7 @@ class Mailing
         return ['status' => 1];
     }
 
-    public static function sendBillNotifications()
+    public static function sendBillNotifications(): array
     {
         $billId = trim(Yii::$app->request->post('billNumber'));
         // найду информацию о платеже
@@ -84,7 +84,7 @@ class Mailing
         return ['status' => 1];
     }
 
-    public static function cancelMailing()
+    public static function cancelMailing(): ?array
     {
         $id = trim(Yii::$app->request->post('id'));
         if (!empty($id)) {
@@ -92,11 +92,16 @@ class Mailing
             if (empty($waitingMail)) {
                 return ['message' => 'Похоже, данное письмо уже удалено из очереди, попробуйте обновить данную страницу.'];
             }
-            $waitingMail->delete();
+            try {
+                $waitingMail->delete();
+            } catch (StaleObjectException $e) {
+            } catch (Throwable $e) {
+                die('Не удалось удалить сообщение');
+            }
             return ['status' => 1];
-        } else {
-            return ['message' => 'Не найден идентификатор сообщения.'];
         }
+
+        return ['message' => 'Не найден идентификатор сообщения.'];
     }
 
     /**
@@ -105,7 +110,7 @@ class Mailing
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public static function sendMessage()
+    public static function sendMessage(): array
     {
         $id = trim(Yii::$app->request->post('id'));
         if (!empty($id)) {
@@ -120,8 +125,6 @@ class Mailing
             $mailSettings = new MailSettings();
             $mailAddress = $mailSettings->is_test ? $mailSettings->test_mail : $mailInfo->email;
             // создам тело и заголовок письма
-            $theme = '';
-            $body = '';
             if (!empty($waitingMail->billId)) {
                 $bill = Bill::findOne($waitingMail->billId);
                 if (empty($bill)) {
@@ -194,7 +197,7 @@ class Mailing
         }
     }
 
-    public static function saveMailTemplate()
+    public static function saveMailTemplate(): array
     {
         $text = Yii::$app->request->post('template');
         if (!empty($text)) {
@@ -203,16 +206,17 @@ class Mailing
             $filename = dirname($_SERVER['DOCUMENT_ROOT'] . './/') . '/settings/mail_template';
             file_put_contents($filename, $encodedText);
             return ['status' => 1];
-        } else {
-            return ['message' => 'Шаблон пуст'];
         }
+
+        return ['message' => 'Шаблон пуст'];
     }
 
     public static function getMailingTemplate()
     {
         $filename = dirname($_SERVER['DOCUMENT_ROOT'] . './/') . '/settings/mail_template';
-        if (is_file($filename))
+        if (is_file($filename)) {
             $content = file_get_contents($filename);
+        }
         if (empty($content)) {
             return 'Заполните шаблон письма в разделе настроек';
         }
