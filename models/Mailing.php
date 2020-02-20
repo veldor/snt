@@ -23,6 +23,7 @@ class Mailing
      */
     public static function createMailing(): array
     {
+        echo "here";
         $title = Yii::$app->request->post('title');
         $body = Yii::$app->request->post('body');
         $mails = Yii::$app->request->post('addresses');
