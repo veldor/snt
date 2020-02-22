@@ -10,12 +10,14 @@ use app\models\Invoice;
 use app\models\Mailing;
 use app\models\MailSettings;
 use app\models\PowerBill;
+use app\models\utils\DbRestore;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\web\UploadedFile;
 
 class SettingsController extends Controller
 {
@@ -38,13 +40,21 @@ class SettingsController extends Controller
      */
     public function actionIndex(): string
     {
+        // если переданы данные постом- это бекап базы данных
+        if(Yii::$app->request->isPost){
+            $restoreModel = new DbRestore();
+            $restoreModel->file = UploadedFile::getInstance($restoreModel, 'file');
+            $restoreModel->restore();
+        }
+
         // получу общие данные о счёте
         $bankInfo = Invoice::getBankInfo();
         $mailSettings = new MailSettings();
         $mailTemplate = Mailing::getMailingTemplate();
         $billMailTemplate = Bill::getMailingTemplate();
         $powerSettings = new PowerBill();
-        return $this->render('index', ['bankInfo' => $bankInfo, 'mailSettings' => $mailSettings, 'mailTemplate' => $mailTemplate, 'billMailTemplate' => $billMailTemplate, 'powerSettings' => $powerSettings]);
+        $dbRestore = new DbRestore();
+        return $this->render('index', ['bankInfo' => $bankInfo, 'mailSettings' => $mailSettings, 'mailTemplate' => $mailTemplate, 'billMailTemplate' => $billMailTemplate, 'powerSettings' => $powerSettings, 'dbRestore' => $dbRestore]);
     }
 
     public function actionEditBankSettings(){

@@ -49,6 +49,8 @@ return [
 
     'cottage/next' => 'site/next',
     'cottage/previous' => 'site/previous',
+    'backup-db' => 'utils/backup-db',
+    'download-db-backup' => 'site/download-db',
 
 
     'update' => 'utils/update',

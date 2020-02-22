@@ -5,6 +5,15 @@ function handleSettings() {
         function () {
             sendAjax('get', '/update', simpleAnswerHandler);
         });
+    let backupDbBtn = $('button#backupDb');
+    backupDbBtn.on('click.getUpdate',
+        function () {
+            sendAjax('get', '/backup-db', function () {
+                // сохраню файл
+                let newWindow = window.open('/download-db-backup');
+                newWindow.focus();
+            });
+        });
 
     let form = $('form#bank-settings-form');
     form.on('submit', function (e) {
@@ -90,6 +99,14 @@ function handleSettings() {
             makeInformer("danger",
                 'Ошибка!',
                 "Необходимо заполнить шаблон рассылки");
+        }
+    });
+
+    // при выборе файлов регистра- отправлю форму
+    let registryInput = $('#restoreDbInput');
+    registryInput.on('change.send', function () {
+        if($(this).val()){
+            $(this).parents('form').trigger('submit');
         }
     });
 }
