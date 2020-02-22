@@ -332,7 +332,7 @@ function handleGlobalOptions() {
 }
 
 $(function () {
-    handleGlobalOptions();
+    //handleGlobalOptions();
 });
 
 function roundRubles(num) {

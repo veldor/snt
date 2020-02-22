@@ -4,6 +4,7 @@ use app\assets\SettingsAsset;
 use app\models\Invoice;
 use app\models\MailSettings;
 use app\models\PowerBill;
+use app\models\utils\DbRestore;
 use mihaildev\ckeditor\CKEditor;
 use nirvana\showloading\ShowLoadingAsset;
 use yii\helpers\Html;
@@ -16,6 +17,7 @@ use yii\widgets\ActiveForm;
 /* @var $mailTemplate string */
 /* @var $billMailTemplate string */
 /* @var $powerSettings PowerBill */
+/* @var $dbRestore DbRestore */
 
 SettingsAsset::register($this);
 ShowLoadingAsset::register($this);
@@ -31,7 +33,7 @@ $this->title = 'Настройки';
     <li><a href="#email_template" data-toggle="tab">Стандартный шаблон письма</a></li>
     <li><a href="#bill_email_template" data-toggle="tab">Шаблон сообщения о выставленном счёте</a></li>
     <li><a href="#power_settings" data-toggle="tab">Настройки электроэнергии</a></li>
-    <!--<li><a href="#misc_settings" data-toggle="tab">Разные настройки</a></li>-->
+    <li><a href="#misc_settings" data-toggle="tab">Разные настройки</a></li>
 </ul>
 
 <div class="tab-content">
@@ -189,14 +191,26 @@ $this->title = 'Настройки';
             ?>
         </div>
     </div>
-    <!--<div class="tab-pane" id="misc_settings">
+    <div class="tab-pane" id="misc_settings">
         <div class="row">
-            <div class="col-sm-12">
-                <button id="doUpdate" class="btn btn-default"><span class="text-success">Обновить до последней версии</span></button>
+            <div class="col-sm-12 margin">
+                <div class="btn-group-vertical">
+                    <!--<button id="doUpdate" class="btn btn-default"><span class="text-success">Обновить до последней версии</span></button>-->
+                    <button id="backupDb" class="btn btn-default"><span
+                                class="text-success">Резервная копия базы данных</span></button>
+                    <label class="btn btn-default" for="restoreDbInput"><span class="text-info">Восстановить базу данных</span></label>
+                    <?php
+                    $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]);
+                    echo $form->field($dbRestore, 'file', ['template' =>
+                        '{input}'])
+                        ->fileInput(['class' => 'hidden', 'id' => 'restoreDbInput', 'multiple' => false, 'accept' => '.sql']);
+                    ActiveForm::end();
+                    ?>
+                </div>
             </div>
-           <div class="btn-group">
-           </div>
+            <div class="btn-group">
+            </div>
         </div>
-    </div>-->
+    </div>
 </div>
 

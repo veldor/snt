@@ -12,6 +12,7 @@ use app\models\database\Payer;
 use app\models\database\Phone;
 use app\models\Mailing;
 use app\models\PDFHandler;
+use app\models\utils\Misc;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
@@ -260,5 +261,13 @@ class UtilsController extends Controller
         file_put_contents('update_result.txt', $result);
         Yii::$app->session->addFlash('success', 'Программа обновлена до последней версии.');
         return ['status' => 1];
+    }
+
+    /**
+     *
+     */
+    public function actionBackupDb(): void
+    {
+       $backupPath = Misc::backupDatabase();
     }
 }

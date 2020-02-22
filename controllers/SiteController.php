@@ -14,6 +14,8 @@ use app\models\Invoice;
 use app\models\MassMembership;
 use app\models\MassTarget;
 use app\models\Migration;
+use app\models\utils\Misc;
+use DateTime;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
@@ -168,9 +170,24 @@ class SiteController extends Controller
         return $this->redirect($url, 301);
     }
 
-    public function actionHistory(){
+    /**
+     * @return string
+     */
+    public function actionHistory(): string
+    {
         $mailings = Mailing::getAll();
         $massBills = MassBill::getAll();
         return $this->render('history', ['mailing' => $mailings, 'bill' => $massBills]);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function actionDownloadDb(): void
+    {
+        $path = Misc::getDbBackupPath();
+        $date = new DateTime();
+        $d = $date->format('Y-m-d H:i:s');
+        Yii::$app->response->sendFile($path, "Резервная копия базы данных СНТ Линда {$d}.sql");
     }
 }
