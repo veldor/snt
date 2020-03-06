@@ -31,11 +31,11 @@ tests/_support/_generated
 
 #vagrant folder
 /.vagrant
-# Project exclude paths
-runtime/
-# Test
-test/
-# vargant
-vargant/
-import/
-settings/
+/settings/bank_settings
+/settings/bill_mail_template
+/settings/db_settings
+/settings/mail_settings
+/settings/mail_template
+/tests/
+/vagrant/
+/runtime/

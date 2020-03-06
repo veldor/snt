@@ -13,6 +13,7 @@ use app\models\database\Phone;
 use app\models\Mailing;
 use app\models\PDFHandler;
 use app\models\utils\Misc;
+use DateTime;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
@@ -269,5 +270,12 @@ class UtilsController extends Controller
     public function actionBackupDb(): void
     {
        $backupPath = Misc::backupDatabase();
+    }
+
+    public function actionSaveRegister(){
+        $path = Misc::getRegisterPath();
+        $date = new DateTime();
+        $d = $date->format('Y-m-d H:i:s');
+        Yii::$app->response->sendFile($path, "Реестр садоводов СНТ Линда {$d}.xml");
     }
 }
