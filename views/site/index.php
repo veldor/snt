@@ -41,5 +41,12 @@ $this->title = 'Участки';
                 ?>
             </div>
         </div>
+
+        <div class="col-sm-12 text-center margin">
+            <div class="btn-group">
+                <a href="<?=Url::toRoute(['utils/save-register', 'type' => 'membership']);?>" target="_blank" class="btn btn-default"><span class="text-success">Сохранить данные для реестра</span>
+                </a>
+            </div>
+        </div>
     </div>
 </div>
