@@ -39,4 +39,5 @@ tests/_support/_generated
 /tests/
 /vagrant/
 /runtime/
-/settings/power_settings
+/import/
+/settings/
