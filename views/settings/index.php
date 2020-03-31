@@ -37,7 +37,7 @@ $this->title = 'Настройки';
 </ul>
 
 <div class="tab-content">
-    <div class="tab-pane active" id="bank_set">
+            <div class="tab-pane active" id="bank_set">
         <?php
         $form = ActiveForm::begin([
             'id' => 'bank-settings-form',

@@ -5,7 +5,6 @@ function handle() {
     addNewBtn.on('click.add', function () {
         sendAjax('get', '/form/cottage-add', handleModalForm);
     });
-
 }
 
 $(function () {
