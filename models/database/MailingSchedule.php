@@ -19,12 +19,13 @@ use yii\web\NotFoundHttpException;
  * @property int $mailingId [int(10) unsigned]
  * @property int $mailId [int(10) unsigned]
  * @property int $billId [int(10) unsigned]
+ * @property string $bills Счета для отправки
  */
 
 class MailingSchedule extends ActiveRecord
 {
 
-    public static function tableName()
+    public static function tableName():string
     {
         return 'mailing_schedule';
     }
@@ -42,7 +43,12 @@ class MailingSchedule extends ActiveRecord
         return self::find()->count();
     }
 
-    public static function clearSchedule()
+    /**
+     * @return array
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public static function clearSchedule(): array
     {
         $allMessages = self::find()->all();
         if(!empty($allMessages)){
@@ -68,5 +74,28 @@ class MailingSchedule extends ActiveRecord
     public static function getBillingMessages($billing): array
     {
         return self::find()->where(['mailingId' => $billing->id])->all();
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     * @throws NotFoundHttpException
+     */
+    public static function addBills(array $data): bool
+    {
+        if($data !== null && count($data) > 0){
+            $keys = array_keys($data);
+            // найду данные об участке
+            $cottage = Cottage::getCottage(Bill::findOne($keys[0])->cottageNumber);
+            $value = implode(',', $keys);
+            $mails = Mail::getCottageMails($cottage);
+            if(!empty($mails)){
+                foreach ($mails as $mail) {
+                    (new self(['bills' => $value, 'mailId' => $mail->id]))->save();
+                }
+                return true;
+            }
+        }
+        return false;
     }
 }

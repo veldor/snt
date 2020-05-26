@@ -7,7 +7,7 @@ namespace app\models;
 class CashHandler
 {
 
-    public static function toDBCash($amount)
+    public static function toDBCash($amount): int
     {
         // заменю запятую на точку, если она есть
         $amount = str_ireplace(',', '.', $amount);
@@ -19,7 +19,7 @@ class CashHandler
      * @param string $amount
      * @return string
      */
-    public static function toSmooth(string $amount)
+    public static function toSmooth(string $amount): string
     {
         return (int) ($amount / 100) . ' руб. ' . $amount % 100 . ' коп.';
     }

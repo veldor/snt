@@ -187,3 +187,11 @@ div#goToCottageContainer{
     width: 130px;
     padding-top: 8px;
 }
+
+.last-clicked{
+    background-color: #9ee0ea;
+}
+
+table>tbody>tr.align-middle>td{
+    vertical-align: middle;
+}

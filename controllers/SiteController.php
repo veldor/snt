@@ -23,6 +23,7 @@ use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\web\ErrorAction;
 
 class SiteController extends Controller
 {
@@ -33,7 +34,7 @@ class SiteController extends Controller
     {
         return [
             'error' => [
-                'class' => 'yii\web\ErrorAction',
+                'class' => ErrorAction::class,
             ],
         ];
     }
@@ -43,7 +44,7 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         //Migration::migrate();
         // получу список участков
@@ -63,7 +64,7 @@ class SiteController extends Controller
      * @return string
      * @throws NotFoundHttpException
      */
-    public function actionShow($cottageNumber)
+    public function actionShow($cottageNumber): string
     {
         $cottage = Cottage::getCottage($cottageNumber);
         $payers = Payer::getCottagePayers($cottage);
@@ -76,9 +77,8 @@ class SiteController extends Controller
     /**
      * @param $id
      * @return string
-     * @throws NotFoundHttpException
      */
-    public function actionShowBill($id)
+    public function actionShowBill($id): string
     {
         $billInfo = Bill::findOne($id);
         $invoice = Invoice::getInstance($billInfo);
@@ -90,7 +90,7 @@ class SiteController extends Controller
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public function actionCottageDelete()
+    public function actionCottageDelete(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Cottage::deleteCottage();
@@ -98,7 +98,6 @@ class SiteController extends Controller
 
     /**
      * @return array
-     * @throws NotFoundHttpException
      */
     public function actionBillAdd(): array
     {
@@ -107,7 +106,7 @@ class SiteController extends Controller
     }
 
 
-    public function actionMailing($id = null)
+    public function actionMailing($id = null): string
     {
         $previousMailngInfo = null;
         $mailsList = Mail::getAllMailsByCottages();
@@ -117,7 +116,7 @@ class SiteController extends Controller
         return $this->render('mailing', ['mails' => $mailsList, 'mailing' => $previousMailngInfo]);
     }
 
-    public function actionMailingSchedule()
+    public function actionMailingSchedule(): string
     {
         $waitingMessages = MailingSchedule::getWaiting();
         return $this->render('mailing-schedule', ['waiting' => $waitingMessages]);

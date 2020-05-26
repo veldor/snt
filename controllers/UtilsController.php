@@ -14,6 +14,7 @@ use app\models\Mailing;
 use app\models\PDFHandler;
 use app\models\utils\Misc;
 use DateTime;
+use Exception;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
@@ -196,6 +197,8 @@ class UtilsController extends Controller
     /**
      * @return array
      * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionClearMailingSchedule(): array
     {
@@ -269,13 +272,32 @@ class UtilsController extends Controller
      */
     public function actionBackupDb(): void
     {
-       $backupPath = Misc::backupDatabase();
+       Misc::backupDatabase();
     }
 
-    public function actionSaveRegister(){
+    /**
+     * @throws Exception
+     */
+    public function actionSaveRegister(): void
+    {
         $path = Misc::getRegisterPath();
         $date = new DateTime();
         $d = $date->format('Y-m-d H:i:s');
         Yii::$app->response->sendFile($path, "Реестр садоводов СНТ Линда {$d}.xml");
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionSendMultipleInvoice(): array
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
+            $data = Yii::$app->request->post('Send');
+            if(!empty($data) && MailingSchedule::addBills($data)) {
+                return ['status' => 1, 'message' => 'Письма добавлены в очередь отправки'];
+            }
+        }
+        return ['status' => 2, 'message' => 'Не удалось создать рассылку, возможно, у участка нет адресов электронной почты или вы не выбрали счета для отправки'];
     }
 }

@@ -22,15 +22,15 @@ use yii\web\NotFoundHttpException;
 class Mail extends ActiveRecord
 {
 
-    const SCENARIO_CREATE = 'create';
-    const SCENARIO_EDIT = 'edit';
+    public const SCENARIO_CREATE = 'create';
+    public const SCENARIO_EDIT = 'edit';
 
-    public static function tableName()
+    public static function tableName():string
     {
         return 'mails';
     }
 
-    public function scenarios()
+    public function scenarios():array
     {
         return [
             self::SCENARIO_CREATE => ['fio', 'email', 'cottage_num'],
@@ -58,33 +58,21 @@ class Mail extends ActiveRecord
         ];
     }
 
-    public static function deletePayer()
-    {
-        $payerId = trim(Yii::$app->request->post('id'));
-        if(!empty($payerId)){
-            $payer = self::findOne(['id' => $payerId]);
-            if(!empty($payer)){
-                $payer->delete();
-                Yii::$app->session->addFlash('success', "Плательщик удалён.");
-                return ['status' => 1];
-
-            }
-            return ['message' => 'Не найден плательщик'];
-        }
-        return ['message' => 'Не найден идентификатор плательщика'];
-    }
-
-    public static function getCottageMails(Cottage $cottage)
+    /**
+     * @param Cottage $cottage
+     * @return Mail[]
+     */
+    public static function getCottageMails(Cottage $cottage): array
     {
         return self::findAll(['cottage_num' => $cottage->id]);
     }
 
-    public static function deleteMail()
+    public static function deleteMail(): array
     {
         $mailId = trim(Yii::$app->request->post('id'));
         if(!empty($mailId)){
             $mail = self::findOne(['id' => $mailId]);
-            if(!empty($mail)){
+            if($mail !== null){
                 $mail->delete();
                 Yii::$app->session->addFlash('success', "Почта удалёна.");
                 return ['status' => 1];
@@ -123,10 +111,10 @@ class Mail extends ActiveRecord
      * @return Mail|null
      * @throws NotFoundHttpException
      */
-    public static function getMailById($mail)
+    public static function getMailById($mail): ?Mail
     {
         $existentMail = self::findOne($mail);
-        if(empty($existentMail)){
+        if($existentMail === null){
             throw new NotFoundHttpException();
         }
         return $existentMail;

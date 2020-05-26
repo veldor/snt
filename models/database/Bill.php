@@ -9,6 +9,7 @@ use app\models\DOMHandler;
 use app\models\PowerBill;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
 /**
  * Class Table_bank_invoices
@@ -38,7 +39,7 @@ class Bill extends ActiveRecord
     {
         $answer = "<table class='table table-condensed table-striped table-hover'><thead><tr><th>Номер участка</th><th>Статус</th></tr></thead>";
         $massBill = MassBill::findOne($id);
-        if (!empty($massBill)) {
+        if ($massBill !== null) {
             // получу выставленные счета
             $bills = self::find()->where(['mass_bill_id' => $massBill->id])->all();
             if (!empty($bills)) {
@@ -91,12 +92,17 @@ class Bill extends ActiveRecord
         }
     }
 
-    public static function deleteBill()
+    /**
+     * @return array
+     * @throws \Throwable
+     * @throws StaleObjectException
+     */
+    public static function deleteBill(): array
     {
         $billId = trim(Yii::$app->request->post('id'));
         if (!empty($billId)) {
             $bill = self::findOne(['id' => $billId]);
-            if (!empty($bill)) {
+            if ($bill !== null) {
                 $bill->delete();
                 Yii::$app->session->addFlash('success', "Счёт удалён.");
                 return ['status' => 1];
@@ -113,7 +119,7 @@ class Bill extends ActiveRecord
      */
     public static function getMailingTemplate($bill = null)
     {
-        if ($bill != null && $bill->service_name === 'power' && PowerBill::isTemplated($bill)) {
+        if ($bill !== null && $bill->service_name === 'power' && PowerBill::isTemplated($bill)) {
             // добавлю в текст таблицу с данными по электроэнергии
             $powerDetails = PowerBill::getDetailsTable($bill);
         }

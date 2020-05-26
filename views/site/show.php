@@ -41,11 +41,11 @@ $this->title = "$cottage->num участок";
     <?php
     // покажу данные по участку
     echo "<div class='col-sm-12'><table class=\"table table-condensed table-striped\"><caption>Общие сведения об участке</caption><tbody>";
-    echo "<tr><td>Площадь участка</td><td>" . ($cottage->square ? '<b class="text-success">' . $cottage->square . ' M<sup>2</sup></b>' : '<b class="text-danger">не задана</b>') . "</td>";
-    echo "<tr><td>Членство собственника</td><td>" . ($cottage->membership ? '<b class="text-success">' . $cottage->membership . '</b>' : '<b class="text-danger">не задано</b>') . "</td>";
-    echo "<tr><td>Данные о праве собственности</td><td>" . ($cottage->rigths ? '<b class="text-success">' . $cottage->rigths . '</b>' : '<b class="text-danger">не задано</b>') . "</td>";
-    echo "<tr><td>Дополнительные сведения об участке</td><td>" . ($cottage->description ? '<b class="text-success">' . $cottage->rigths . '</b>' : '<b class="text-danger">не указаны</b>') . "</td>";
-    echo "</tbody></table></div>";
+    echo '<tr><td>Площадь участка</td><td>' . ($cottage->square ? '<b class="text-success">' . $cottage->square . ' M<sup>2</sup></b>' : '<b class="text-danger">не задана</b>') . '</td>';
+    echo '<tr><td>Членство собственника</td><td>' . ($cottage->membership ? '<b class="text-success">' . $cottage->membership . '</b>' : '<b class="text-danger">не задано</b>') . '</td>';
+    echo '<tr><td>Данные о праве собственности</td><td>' . ($cottage->rigths ? '<b class="text-success">' . $cottage->rigths . '</b>' : '<b class="text-danger">не задано</b>') . '</td>';
+    echo '<tr><td>Дополнительные сведения об участке</td><td>' . ($cottage->description ? '<b class="text-success">' . $cottage->description . '</b>' : '<b class="text-danger">не указаны</b>') . '</td>';
+    echo '</tbody></table></div>';
 
     echo "<div class='col-sm-12'>";
 
@@ -114,6 +114,8 @@ $this->title = "$cottage->num участок";
             echo "<tr><td>$billType</td><td>$description</td><td>{$bill->payer}</td><td>{$amount}</td><td><div class='btn-group'><button class='btn btn-default bill-delete' data-id='{$bill->id}'><span class='text-danger glyphicon glyphicon-trash'></span></button><button class='btn btn-default bill-change' data-id='{$bill->id}'><span class='text-info glyphicon glyphicon-pencil'></span></button>$printBtn $sendBtn $saveBtn</div></td></tr>";
         }
         echo '</tbody></table></div>';
+
+        echo '<div class="col-sm-12 text-center"><button class="btn btn-default" id="multipleInvoiceSendButton"><span class="text-success">Отправить несколько квитанций в одном письме</span></button></div>';
 
 /*        foreach ($bills as $bill){
             echo "<div class='col-sm-12 margin'><a target='_blank' href='/bill/{$bill->number}'><b class='text-success'>{$bill->number}</b></a> <span>{$bill->amount}</span> <button class='btn btn-default'><span class='glyphicon glyphicon-print'></span></button> <button class='btn btn-default'><span class='glyphicon glyphicon-send'></span></button> <button class='btn btn-default'><span class='glyphicon glyphicon-saved'></span></button></div>";

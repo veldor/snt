@@ -43,7 +43,7 @@ class Mailing
         $mailing->save();
         foreach ($parsedMails as $mail) {
             $existentMail = Mail::getMailById($mail);
-            if($existentMail === null){
+            if ($existentMail === null) {
                 return ['message' => 'Не найден адрес почты, возможно, удалён!'];
             }
             $mailsList .= "<mail id='{$existentMail->id}'/>";
@@ -119,7 +119,7 @@ class Mailing
                 return ['message' => 'Похоже, данное письмо уже удалено из очереди, попробуйте обновить данную страницу.'];
             }
             $mailInfo = Mail::getMailById($waitingMail->mailId);
-            if($mailInfo === null){
+            if ($mailInfo === null) {
                 return ['message' => 'Не найдены сведения об адресе электронной почты.'];
             }
             $mailSettings = new MailSettings();
@@ -127,7 +127,7 @@ class Mailing
             // создам тело и заголовок письма
             if (!empty($waitingMail->billId)) {
                 $bill = Bill::findOne($waitingMail->billId);
-                if (empty($bill)) {
+                if ($bill === null) {
                     return ['message' => 'Не найден счёт'];
                 }
                 $fileInfo = PDFHandler::saveBillPdf($bill->id);
@@ -143,7 +143,7 @@ class Mailing
                 $bill->save();
             } else if (!empty($waitingMail->mailingId)) {
                 $mailing = database\Mailing::findOne($waitingMail->mailingId);
-                if (empty($mailing)) {
+                if ($mailing === null) {
                     return ['message' => 'Рассылка не найдена'];
                 }
                 $theme = urldecode($mailing->title);
@@ -152,6 +152,37 @@ class Mailing
                     GrammarHandler::handlePersonals($mailInfo->fio),
                     $theme,
                     $body);
+            } elseif (!empty($waitingMail->bills)) {
+                // получу данные о счетах, сгенерирую PDF для каждого, отправлю письмо с несколькими вложениями и удалю счета
+                $bills = explode(',', $waitingMail->bills);
+                $attachments = [];
+                foreach ($bills as $bill) {
+                    $bill = Bill::findOne($bill);
+                    // проверю, что номер участка счёта совпадает с номером участка почтового адреса
+                    if ($bill !== null && $bill->cottageNumber === (string)$mailInfo->cottage_num) {
+                        $fileInfo = PDFHandler::saveBillPdf($bill->id, true);
+                        $attachments[] = $fileInfo;
+                    } else {
+                        return ['message' => "Не совпадает номер участка в счёте ({$bill->cottageNumber}) и почте ({$mailInfo->cottage_num})"];
+                    }
+                }
+                if (!empty($attachments)) {
+                    try {
+                        $theme = 'Вам выставлены счёта за услуги СНТ';
+                        $body = Yii::$app->controller->renderPartial('/mail/root-template', ['mail' => $mailInfo, 'bills' => $bills]);
+                        // тут отправлю письмо
+                        $sending = self::send($mailAddress,
+                            GrammarHandler::handlePersonals($mailInfo->fio),
+                            $theme,
+                            $body,
+                            $attachments);
+                        // тут удалю файлы
+                    } finally {
+                        foreach ($attachments as $attachment) {
+                            unlink($attachment['url']);
+                        }
+                    }
+                }
             } else {
                 return ['message' => 'Не найден контент письма'];
             }
@@ -186,7 +217,9 @@ class Mailing
             ->setTo([$address => $receiverName]);
 
         if (!empty($attachment)) {
-            $mail->attach($attachment['url'], ['fileName' => $attachment['name']]);
+            foreach ($attachment as $item) {
+                $mail->attach($item['url'], ['fileName' => $item['name']]);
+            }
         }
         try {
             $mail->send();

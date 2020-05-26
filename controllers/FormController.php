@@ -50,17 +50,18 @@ class FormController extends Controller
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             $form = Payer::findOne($id);
-            if(empty($form)){
+            if ($form === null) {
                 die('Не наден плательщик');
             }
             $form->setScenario(Payer::SCENARIO_EDIT);
             $form->load(Yii::$app->request->post());
             $form->save();
-            Yii::$app->session->addFlash('success', "Данные плательщика изменены.");
+            Yii::$app->session->addFlash('success', 'Данные плательщика изменены.');
             return ['status' => 1];
         }
         throw new NotFoundHttpException();
     }
+
     /**
      * @param $id
      * @return array
@@ -80,11 +81,13 @@ class FormController extends Controller
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             $form = Mail::findOne($id);
-            $form->setScenario(Mail::SCENARIO_EDIT);
-            $form->load(Yii::$app->request->post());
-            $form->save();
-            Yii::$app->session->addFlash('success', "Данные адреса электронной почты изменены.");
-            return ['status' => 1];
+            if ($form !== null) {
+                $form->setScenario(Mail::SCENARIO_EDIT);
+                $form->load(Yii::$app->request->post());
+                $form->save();
+                Yii::$app->session->addFlash('success', 'Данные адреса электронной почты изменены.');
+                return ['status' => 1];
+            }
         }
         throw new NotFoundHttpException();
     }
@@ -94,7 +97,7 @@ class FormController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionPhoneChange($id)
+    public function actionPhoneChange($id): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -108,30 +111,35 @@ class FormController extends Controller
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             $form = Phone::findOne($id);
-            $form->setScenario(Phone::SCENARIO_EDIT);
-            $form->load(Yii::$app->request->post());
-            $form->save();
-            Yii::$app->session->addFlash('success', "Данные номера телефона изменены.");
-            return ['status' => 1];
+            if ($form !== null) {
+                $form->setScenario(Phone::SCENARIO_EDIT);
+                $form->load(Yii::$app->request->post());
+                $form->save();
+                Yii::$app->session->addFlash('success', 'Данные номера телефона изменены.');
+                return ['status' => 1];
+            }
         }
         throw new NotFoundHttpException();
     }
+
     /**
      * @param $id
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionBillChange($id = false)
+    public function actionBillChange($id = false): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             $form = Bill::findOne($id);
-            $form->amount = CashHandler::toFloat($form->amount);
-            $view = $this->renderAjax('change-bill', ['matrix' => $form]);
-            return ['status' => 1,
-                'header' => 'Изменение данных счёта',
-                'data' => $view,
-            ];
+            if($form !== null){
+                $form->amount = CashHandler::toFloat($form->amount);
+                $view = $this->renderAjax('change-bill', ['matrix' => $form]);
+                return ['status' => 1,
+                    'header' => 'Изменение данных счёта',
+                    'data' => $view,
+                ];
+            }
         }
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -140,7 +148,7 @@ class FormController extends Controller
             $form->load(Yii::$app->request->post());
             $form->amount = CashHandler::toDBCash($form->amount);
             $form->save();
-            Yii::$app->session->addFlash('success', "Данные счёта изменены.");
+            Yii::$app->session->addFlash('success', 'Данные счёта изменены.');
             return ['status' => 1];
         }
         throw new NotFoundHttpException();
@@ -151,7 +159,7 @@ class FormController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionPayerAdd($cottageNumber = null)
+    public function actionPayerAdd($cottageNumber = null): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -169,17 +177,17 @@ class FormController extends Controller
             $form = new Payer(['scenario' => Payer::SCENARIO_CREATE]);
             $form->load(Yii::$app->request->post());
             $form->save();
-            Yii::$app->session->addFlash('success', "Добавлен новый плательщик.");
+            Yii::$app->session->addFlash('success', 'Добавлен новый плательщик.');
             return ['status' => 1];
         }
         throw new NotFoundHttpException();
     }
+
     /**
-     * @param null $cottageNumber
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionCottageAdd()
+    public function actionCottageAdd(): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -195,21 +203,22 @@ class FormController extends Controller
             $form = new Cottage(['scenario' => Payer::SCENARIO_CREATE]);
             $form->load(Yii::$app->request->post());
             // проверю, не зарегистрирован ли ещё участок с таким же номером
-            if(Cottage::exist($form->num)){
+            if (Cottage::exist($form->num)) {
                 return ['message' => 'Участок с таким номером уже зарегистрирован'];
             }
             $form->save();
-            Yii::$app->session->addFlash('success', "Добавлен новый участок.");
+            Yii::$app->session->addFlash('success', 'Добавлен новый участок.');
             return ['status' => 1];
         }
         throw new NotFoundHttpException();
     }
+
     /**
-     * @param null $cottageNumber
+     * @param $id
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionCottageChange($id)
+    public function actionCottageChange($id): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -227,17 +236,18 @@ class FormController extends Controller
             $form->setScenario(Cottage::SCENARIO_EDIT);
             $form->load(Yii::$app->request->post());
             $form->save();
-            Yii::$app->session->addFlash('success', "Данные об участке изменены.");
+            Yii::$app->session->addFlash('success', 'Данные об участке изменены.');
             return ['status' => 1];
         }
         throw new NotFoundHttpException();
     }
+
     /**
      * @param null $cottageNumber
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionMailAdd($cottageNumber = null)
+    public function actionMailAdd($cottageNumber = null): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -254,14 +264,13 @@ class FormController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
             $form = new Mail(['scenario' => Mail::SCENARIO_CREATE]);
             $form->load(Yii::$app->request->post());
-            if($form->validate()){
+            if ($form->validate()) {
                 $form->save();
-                Yii::$app->session->addFlash('success', "Добавлен адрес электронной почты.");
+                Yii::$app->session->addFlash('success', 'Добавлен адрес электронной почты.');
                 return ['status' => 1];
             }
-            else{
-                return ['message' => $form->getErrors()];
-            }
+
+            return ['message' => $form->getErrors()];
         }
         throw new NotFoundHttpException();
     }
@@ -271,7 +280,7 @@ class FormController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionPhoneAdd($cottageNumber = null)
+    public function actionPhoneAdd($cottageNumber = null): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -288,9 +297,9 @@ class FormController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
             $form = new Phone(['scenario' => Phone::SCENARIO_CREATE]);
             $form->load(Yii::$app->request->post());
-            if($form->validate()){
+            if ($form->validate()) {
                 $form->save();
-                Yii::$app->session->addFlash('success', "Добавлен номер телефона.");
+                Yii::$app->session->addFlash('success', 'Добавлен номер телефона.');
                 return ['status' => 1];
             }
 
@@ -298,6 +307,7 @@ class FormController extends Controller
         }
         throw new NotFoundHttpException();
     }
+
     /**
      * @param null $cottageNumber
      * @return array
@@ -321,7 +331,7 @@ class FormController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
             $form = new Bill(['scenario' => Bill::SCENARIO_CREATE]);
             $form->load(Yii::$app->request->post());
-            if($form->validate() && $form->fillMore()){
+            if ($form->validate() && $form->fillMore()) {
                 $form->save();
                 Yii::$app->session->addFlash('success', 'Добавлен счёт.');
                 return ['status' => 1];
@@ -356,7 +366,7 @@ class FormController extends Controller
             $form = new PowerBill();
             $form->setScenario(PowerBill::SCENARIO_CREATE);
             $form->load(Yii::$app->request->post());
-            if($form->validate()){
+            if ($form->validate()) {
                 $form->save();
                 Yii::$app->session->addFlash('success', 'Добавлен счёт.');
                 return ['status' => 1];
@@ -365,5 +375,22 @@ class FormController extends Controller
             return ['message' => $form->getErrors()];
         }
         throw new NotFoundHttpException();
+    }
+
+    /**
+     * @param $cottageNumber
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetCottageBills($cottageNumber): array
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $cottage = Cottage::getCottage($cottageNumber);
+        $bills = Bill::getCottageBills($cottage);
+        $view = $this->renderAjax('show-cottage-bills', ['bills' => $bills]);
+        return ['status' => 1,
+            'header' => 'Массовая отправка квитанций',
+            'data' => $view,
+        ];
     }
 }

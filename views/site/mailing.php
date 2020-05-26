@@ -12,7 +12,7 @@ use yii\web\View;
 /* @var $mails CottageMail[] */
 /* @var $mailing Mailing|null */
 
-$this->title = "Общая рассылка";
+$this->title = 'Общая рассылка';
 
 MailAsset::register($this);
 ShowLoadingAsset::register($this);

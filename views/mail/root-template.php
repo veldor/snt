@@ -10,11 +10,14 @@ $rootTemplate = Mailing::getMailingTemplate();
 
 /* @var $this View */
 /* @var $mail Mail */
-/* @var $bill Bill */
+/* @var $bill ?Bill */
+/* @var $bills ?string */
 
-/* @var $mailing app\models\database\Mailing */
+/* @var $mailing ?app\models\database\Mailing */
 
 $acceptorIO = GrammarHandler::handlePersonals($mail->fio);
+
+$text = '';
 
 if (!empty($bill)) {
     $text = Bill::getMailingTemplate($bill);
@@ -22,6 +25,18 @@ if (!empty($bill)) {
 
 if (!empty($mailing)) {
     $text = urldecode($mailing->body);
+}
+
+if(!empty($bills)){
+    // для каждого счёта найду подробности
+    /*$billsArray = explode(',', $bills);
+    foreach ($billsArray as $billItem) {
+        $billInfo = Bill::findOne($billItem);
+        if($billInfo !== null){
+            $text .= Bill::getMailingTemplate($billInfo);
+        }
+    }*/
+    $text = 'Вам выставлены счета за услуги СНТ. Квитанции находятся во вложении к письму.';
 }
 
 $text = GrammarHandler::handleMailText($rootTemplate, $acceptorIO, $text);

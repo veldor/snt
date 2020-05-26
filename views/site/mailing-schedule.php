@@ -30,11 +30,14 @@ if (!empty($waiting)) {
             if (!empty($item->mailingId)) {
                 $mailingInfo = Mailing::findOne($item->mailingId);
                 // покажу информацию о ожидающем сообщении
-                echo "<tr class='text-center'><td><b class='text-info'>Рассылка</b></td><td>{$cottage->num}</td><td>" . urldecode($mailingInfo->title) . "</td><td>{$mailInfo->email}</td><td>{$mailInfo->fio}</td><td><b class='text-info mailing-status' data-schedule-id='{$item->id}'>Ожидает отправки</b></td><td><button class='mailing-cancel btn btn-default' data-schedule-id='{$item->id}'><span class='text-danger'>Отменить отправку</span></button></td></tr>";
+                echo "<tr class='text-center align-middle'><td><b class='text-info'>Рассылка</b></td><td>{$cottage->num}</td><td>" . urldecode($mailingInfo->title) . "</td><td>{$mailInfo->email}</td><td>{$mailInfo->fio}</td><td><b class='text-info mailing-status' data-schedule-id='{$item->id}'>Ожидает отправки</b></td><td><button class='mailing-cancel btn btn-default' data-schedule-id='{$item->id}'><span class='text-danger'>Отменить отправку</span></button></td></tr>";
             } elseif (!empty($item->billId)) {
                 $billInfo = Bill::findOne($item->billId);
                 $type = Bill::getType($billInfo->service_name);
-                echo "<tr class='text-center'><td><b class='text-success'>Счёт</b></td><td>{$cottage->num}</td><td>{$type} : {$billInfo->bill_destination}</td><td>{$mailInfo->email}</td><td>{$mailInfo->fio}</td><td><b class='text-info mailing-status' data-schedule-id='{$item->id}'>Ожидает отправки</b></td><td><button class='mailing-cancel btn btn-default' data-schedule-id='{$item->id}'><span class='text-danger'>Отменить отправку</span></button></td></tr>";
+                echo "<tr class='text-center align-middle'><td><b class='text-success'>Счёт</b></td><td>{$cottage->num}</td><td>{$type} : {$billInfo->bill_destination}</td><td>{$mailInfo->email}</td><td>{$mailInfo->fio}</td><td><b class='text-info mailing-status' data-schedule-id='{$item->id}'>Ожидает отправки</b></td><td><button class='mailing-cancel btn btn-default' data-schedule-id='{$item->id}'><span class='text-danger'>Отменить отправку</span></button></td></tr>";
+            }
+            elseif(!empty($item->bills)){
+                echo "<tr class='text-center align-middle'><td><b class='text-success'>Счёта</b></td><td>{$cottage->num}</td><td>Несколько счетов : {$item->bills}</td><td>{$mailInfo->email}</td><td>{$mailInfo->fio}</td><td><b class='text-info mailing-status' data-schedule-id='{$item->id}'>Ожидает отправки</b></td><td><button class='mailing-cancel btn btn-default' data-schedule-id='{$item->id}'><span class='text-danger'>Отменить отправку</span></button></td></tr>";
             }
         } catch (NotFoundHttpException $e) {
             echo $e->getMessage();

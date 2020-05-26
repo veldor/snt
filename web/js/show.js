@@ -1,3 +1,4 @@
+/*global window, location, sendAjax, makeInformer, handleModalForm, makeInformerModal, ajaxFormAnswerHandler, normalReload, makeModal, simpleAnswerHandler */
 "use strict";
 const cottageNumber = location.pathname.split('/')[2];
 
@@ -188,6 +189,38 @@ function handleMe() {
             });
     });
 
+    function showBillsList(data){
+        if(data.status === 1){
+            // покажу форму
+            let modal = makeModal(
+                data.header,
+                data.data
+            );
+            let form = modal.find('form');
+            form.on('submit.send', function (e) {
+                e.preventDefault();
+                sendAjax(
+                  'post',
+                  '/send-multiple-invoice',
+                    simpleAnswerHandler,
+                    form,
+                    true
+                );
+            });
+            modal.show();
+        }
+    }
+
+    // multiple invoices send
+    let misButton = $('button#multipleInvoiceSendButton');
+    misButton.on('click', function () {
+        // отправлю запрос на получение всех счетов, зарегистрированных на участок
+        sendAjax(
+          'get',
+          '/get-bills/' + cottageNumber,
+            showBillsList
+        );
+    });
 }
 
 $(function () {

@@ -1,3 +1,4 @@
+/*global sendAjax, window, simpleAnswerHandler, location, CKEDITOR, makeInformer */
 "use strict";
 function handleSettings() {
     let updateBtn = $('button#doUpdate');
