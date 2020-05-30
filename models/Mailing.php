@@ -137,7 +137,7 @@ class Mailing
                     GrammarHandler::handlePersonals($mailInfo->fio),
                     $theme,
                     $body,
-                    $fileInfo);
+                    [$fileInfo]);
                 $bill->is_sended = 1;
                 $bill->setScenario(Bill::SCENARIO_CREATE);
                 $bill->save();
@@ -209,8 +209,6 @@ class Mailing
      */
     public static function send($address, $receiverName, $subject, $body, $attachment = null): ?array
     {
-        var_dump($attachment);
-        die;
         $form = new MailSettings();
         $mail = Yii::$app->mailer->compose()
             ->setFrom([$form->address => $form->snt_name])
