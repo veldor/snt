@@ -53,22 +53,24 @@ $this->title = 'Участки';
 
 
 <?php
-$referer =  $_SERVER['HTTP_REFERER'];
-if(strpos($referer, 'http://linda.snt/show/') === 0){
-    $cottageNumber = urldecode(substr($referer, 22));
-    echo "<span class=\"hidden\" id=\"scrollTo\">$cottageNumber</span>";
-    ?>
-    <script>
-        let container = $('span#scrollTo');
-        if(container.length === 1){
-            let cottageNumber = container.text();
-            let currentLink = $('a.cottage[data-cottage-id="cottage_' + cottageNumber + '"]');
-            if(currentLink.length === 1){
-                let destination =  currentLink.offset().top;
-                $('html').animate({ scrollTop: destination - 60 }, 500);
-                currentLink.addClass('last-clicked');
+if(!empty($_SERVER['HTTP_REFERER'])){
+    $referer =  $_SERVER['HTTP_REFERER'];
+    if(strpos($referer, 'http://linda.snt/show/') === 0){
+        $cottageNumber = urldecode(substr($referer, 22));
+        echo "<span class=\"hidden\" id=\"scrollTo\">$cottageNumber</span>";
+        ?>
+        <script>
+            let container = $('span#scrollTo');
+            if(container.length === 1){
+                let cottageNumber = container.text();
+                let currentLink = $('a.cottage[data-cottage-id="cottage_' + cottageNumber + '"]');
+                if(currentLink.length === 1){
+                    let destination =  currentLink.offset().top;
+                    $('html').animate({ scrollTop: destination - 60 }, 500);
+                    currentLink.addClass('last-clicked');
+                }
             }
-        }
-    </script>
-<?php
+        </script>
+        <?php
+    }
 }

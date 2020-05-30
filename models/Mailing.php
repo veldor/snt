@@ -209,6 +209,8 @@ class Mailing
      */
     public static function send($address, $receiverName, $subject, $body, $attachment = null): ?array
     {
+        var_dump($attachment);
+        die;
         $form = new MailSettings();
         $mail = Yii::$app->mailer->compose()
             ->setFrom([$form->address => $form->snt_name])
