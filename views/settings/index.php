@@ -56,7 +56,7 @@ $this->title = 'Настройки';
         <?= $form->field($bankInfo, 'kpp') ?>
 
         <div class="form-group">
-            <div class="col-lg-offset-1 col-lg-11">
+            <div class="col-xs-offset-1 col-xs-11">
                 <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
@@ -103,7 +103,7 @@ $this->title = 'Настройки';
         ?>
 
         <div class="form-group">
-            <div class="col-lg-offset-1 col-lg-11">
+            <div class="col-xs-offset-1 col-xs-11">
                 <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
