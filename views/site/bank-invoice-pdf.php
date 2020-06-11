@@ -87,7 +87,7 @@ $qr = $invoice->drawQR();
         }
 
         img.qr-img {
-            width: 80%;
+            width: 50%;
         }
 
         .bottom-bordered {
