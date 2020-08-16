@@ -2,6 +2,8 @@
 /*global window, location */
 'use strict';
 
+let skipMessagesCheck = false;
+
 
 // ПОКАЗЫВАЮ ИНФОРМЕР
 function showAlert(alertDiv) {
@@ -318,21 +320,23 @@ function handleGlobalOptions() {
 
     let unsendedMessagesBage = $('span#unsendedMessagesBadge');
     setInterval(function () {
-        sendAjax('get',
-            '/get-unsended-messages-count',
-            function (data) {
-                if (data.status && data.status === 1) {
-                    unsendedMessagesBage.text(data.count);
-                    if (data.count > 0)
-                        unsendedMessagesBage.addClass('badge-danger');
-                    else{
-                        unsendedMessagesBage.removeClass('badge-danger');
+        if(!skipMessagesCheck){
+            sendAjax('get',
+                '/get-unsended-messages-count',
+                function (data) {
+                    if (data.status && data.status === 1) {
+                        unsendedMessagesBage.text(data.count);
+                        if (data.count > 0)
+                            unsendedMessagesBage.addClass('badge-danger');
+                        else{
+                            unsendedMessagesBage.removeClass('badge-danger');
+                        }
                     }
-                }
-            },
-            false,
-            false,
-            true);
+                },
+                false,
+                false,
+                true);
+        }
     }, 1000);
 }
 

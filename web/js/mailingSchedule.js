@@ -52,6 +52,7 @@ function handleMailingSchedule() {
                             location.reload();
                         }
                     } else if (data.message) {
+                        skipMessagesCheck = false;
                         // возникла ошибка отправки
                         makeInformer('danger', 'ошибка отправки', data.message);
                         targetMessage.removeClass('text-primary').addClass('text-danger').text('Не отправлено');
@@ -66,6 +67,7 @@ function handleMailingSchedule() {
     }
 
     beginSendingBtn.on('click.beginSending', function () {
+        skipMessagesCheck = true;
         sendInProgress = !sendInProgress;
         if (!sendInProgress) {
             cancelMailingBtn.prop('disabled', false);
