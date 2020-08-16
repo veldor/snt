@@ -55,10 +55,6 @@ class MassTarget extends Model
         $cottages = Cottage::getCottages();
         if (!empty($cottages)) {
             foreach ($cottages as $cottage) {
-                // если площадь участка меньше или равна указанному значению- они платят половину цены
-                if(!empty($cottage->square) && $cottage->square <= Cottage::PREFERRED_SQUARE){
-                    $amount /= 2;
-                }
                 // найду плательщиков
                 $payers = Payer::getCottagePayers($cottage);
                 if (!empty($payers)) {
