@@ -189,6 +189,12 @@ class Mailing
 
             if ($sending['status'] === 'sended') {
                 $waitingMail->delete();
+                if (!empty($waitingMail->billId)) {
+                    $bill = Bill::findOne($waitingMail->billId);
+                    $bill->setScenario(Bill::SCENARIO_EDIT);
+                    $bill->is_sended = 1;
+                    $bill->save();
+                }
                 return ['status' => 1];
             }
 
