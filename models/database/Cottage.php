@@ -83,8 +83,8 @@ class Cottage extends ActiveRecord
     public function scenarios()
     {
         return [
-            self::SCENARIO_CREATE => ['num', 'square', 'membership', 'rights', 'description'],
-            self::SCENARIO_EDIT => ['square', 'membership', 'rights', 'description'],
+            self::SCENARIO_CREATE => ['num', 'square', 'membership', 'rigths', 'description'],
+            self::SCENARIO_EDIT => ['square', 'membership', 'rigths', 'description'],
         ];
     }
 
