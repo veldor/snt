@@ -146,6 +146,7 @@ class FormController extends Controller
             $form = Bill::findOne($id);
             $form->setScenario(Bill::SCENARIO_EDIT);
             $form->load(Yii::$app->request->post());
+            $form->payer = Payer::findOne($form->payerId)->fio;
             $form->amount = CashHandler::toDBCash($form->amount);
             $form->save();
             Yii::$app->session->addFlash('success', 'Данные счёта изменены.');
