@@ -36,6 +36,7 @@ tests/_support/_generated
 /settings/db_settings
 /settings/mail_settings
 /settings/mail_template
+/views/layouts/main.php
 /tests/
 /vagrant/
 /runtime/
