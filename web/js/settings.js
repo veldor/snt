@@ -39,7 +39,6 @@ function handleSettings() {
                 true);
     });
     let powerSettingsForm = $('form#power-settings-form');
-    console.log(powerSettingsForm);
     powerSettingsForm.on('submit', function (e) {
        e.preventDefault();
        sendAjax('post',

@@ -12,7 +12,7 @@ class CashHandler
         // заменю запятую на точку, если она есть
         $amount = str_ireplace(',', '.', $amount);
         $numAmount = (float) $amount;
-        return (int) ($numAmount * 100);
+        return (int) round($numAmount * 100, 0, PHP_ROUND_HALF_UP);
     }
 
     /**
@@ -26,6 +26,6 @@ class CashHandler
 
     public static function toFloat(string $amount)
     {
-        return round($amount / 100, 2);
+        return round($amount / 100, 2, PHP_ROUND_HALF_UP);
     }
 }
